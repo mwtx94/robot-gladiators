@@ -1,9 +1,3 @@
-// Game States
-// "WIN" - Player robot has defeated all enemey-robots
-//    * Fight all enemy-robots
-//    * Defeat each enemy-robot
-// "LOSE" - Player robot's health is zero or less
-
 // variable declarations for the player
 var playerName = window.prompt("What is your robot's name?");
 var playerHealth = 100;
@@ -31,15 +25,17 @@ var fight = function (enemyName) {
       // if yes (true), leave fight
       if (confirmSkip) {
         window.alert(playerName + ' has decided to skip this fight. Goodbye!');
-        // subtract money from playerMoney for skipping
-        playerMoney = playerMoney - 10;
+        // subtract money from playerMoney for skipping it doesn't go below zero
+        playerMoney = Math.max(0, playerMoney - 10);
         console.log("playerMoney", playerMoney)
         break;
       }
     }
+    // generate random damage value based on player's attack power
+    var damage = randomNumber(playerAttack - 3, playerAttack);
 
-    // remove enemy's health by subtracting the amount set in the playerAttack variable
-    enemyHealth = enemyHealth - playerAttack;
+    // remove enemy's health by subtracting the amount set in the playerAttack variable it never goes below zero
+    enemyHealth = Math.max(0, enemyHealth - damage);
     console.log(
       playerName + ' attacked ' + enemyName + '. ' + enemyName + ' now has ' + enemyHealth + ' health remaining.'
     );
@@ -55,9 +51,11 @@ var fight = function (enemyName) {
     } else {
       window.alert(enemyName + ' still has ' + enemyHealth + ' health left.');
     }
+    // generate random damage value based on enemy's attack power
+    var damage = randomNumber(enemyAttack - 3, enemyAttack);
 
-    // remove players's health by subtracting the amount set in the enemyAttack variable
-    playerHealth = playerHealth - enemyAttack;
+    // remove players's health by subtracting the amount set in the enemyAttack variable it never goes below zero
+    playerHealth = Math.max(0, playerHealth - damage);
     console.log(
       enemyName + ' attacked ' + playerName + '. ' + playerName + ' now has ' + playerHealth + ' health remaining.'
     );
@@ -89,8 +87,8 @@ var startGame = function () {
       // pick new enemy to fight based on the index of the enemyNames array
       var pickedEnemyName = enemyNames[i];
 
-      // reset enemyHealth before starting new fight
-      enemyHealth = 50;
+      // reset enemyHealth before starting new fight will be a number between 0 and 20 because of the random 21 aspect and then add 40 ensuring that the enemy health can be anywhere from 40-60
+      enemyHealth = Math.floor(Math.random() * 21) + 40;
 
       // pass the pickedEnemyName variable's value into the fight function, where it will assume the value of the enemyName parameter
       fight(pickedEnemyName);
@@ -101,7 +99,7 @@ var startGame = function () {
         var storeConfirm = window.confirm("The fight is over, visit the store before the next round?");
         // if yes, take them to the store() function
         if (storeConfirm) {
-        shop();
+          shop();
         }
       }
     }
@@ -137,55 +135,62 @@ var endGame = function () {
 };
 
 // shop function
-var shop = function() {
+var shop = function () {
   // ask player what they'd like to do
   var shopOptionPrompt = window.prompt(
     "Would you like to REFILL your health, UPGRADE your attack, or LEAVE the store? Please enter one: 'REFILL', 'UPGRADE', or 'LEAVE' to make a choice."
   );
-// use switch to carry out action
-switch (shopOptionPrompt) {
-  case "REFILL": // new case so all caps works as well
-  case "refill":
-    if (playerMoney >= 7) {
-    window.alert("Refilling player's health by 20 for 7 dollars.");
+  // use switch to carry out action
+  switch (shopOptionPrompt) {
+    case "REFILL": // new case so all caps works as well
+    case "refill":
+      if (playerMoney >= 7) {
+        window.alert("Refilling player's health by 20 for 7 dollars.");
 
-    // increase health and decrease money
-    playerHealth = playerHealth + 20;
-    playerMoney = playerMoney - 7;
-    }
-    else {
-      window.alert("You don't have enoguh money!");
-    }
+        // increase health and decrease money
+        playerHealth = playerHealth + 20;
+        playerMoney = playerMoney - 7;
+      }
+      else {
+        window.alert("You don't have enoguh money!");
+      }
 
-    break;
-  case "UPGRADE": // new case so all caps works as well
-  case "upgrade":
-    if (playerMoney >= 7) {
-    window.alert("Upgrading player's attack by 6 for 7 dollars.");
+      break;
+    case "UPGRADE": // new case so all caps works as well
+    case "upgrade":
+      if (playerMoney >= 7) {
+        window.alert("Upgrading player's attack by 6 for 7 dollars.");
 
-    // increase players attack and decrease money
-    playerAttack = playerAttack + 6;
-    playerMoney = playerMoney - 7;
-    }
-    else {
-      window.alert("You don't have enough money!");
-    }
+        // increase players attack and decrease money
+        playerAttack = playerAttack + 6;
+        playerMoney = playerMoney - 7;
+      }
+      else {
+        window.alert("You don't have enough money!");
+      }
 
-    break;
-  case "LEAVE": // new case so all caps works as well
-  case "leave":
-    window.alert("Leaving the store.");
+      break;
+    case "LEAVE": // new case so all caps works as well
+    case "leave":
+      window.alert("Leaving the store.");
 
-    // do nothing, so function will end
-    break;
-  default:
-    window.alert("You did not pick a valid option. Try again.");
+      // do nothing, so function will end
+      break;
+    default:
+      window.alert("You did not pick a valid option. Try again.");
 
-    // call shop() again to force player to pick a valid option
-    shop();
-    break;
-}
+      // call shop() again to force player to pick a valid option
+      shop();
+      break;
+  }
 };
+
+// function to generate a random numeric value
+var randomNumber = function (min, max) {
+  var value = Math.floor(Math.random() * (max - min + 1) + min);
+
+  return value;
+}
 
 // start the game when the page loads
 startGame();
